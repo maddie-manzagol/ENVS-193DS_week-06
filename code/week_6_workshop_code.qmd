@@ -1,0 +1,42 @@
+---
+title: "week 6 in class code"
+format:
+  html:
+    theme: default
+---
+#this is section is called set-up 
+
+loading in packages 
+```{r package-set-uo}
+library(tidyverse) #general organization
+library(here) #organize our folders
+library(naniar) #missing data visualization 
+
+#extra packages 
+library(skimr) #allows quick glimpses 
+library(plotly) #interactive plot 
+library(magick) #insert images into plots
+library(NatParksPalettes) #one example of color palette package
+library(patchwork) #put plots together 
+``` 
+
+#load in the data 
+```{r loading-data}
+#create a new object called whales 
+#read in the whales data 
+
+whales <- read_csv(here("data", "Graywhale_watching_2007_2019.csv"))
+
+```
+
+#look at missing data
+```{r missing-data-vis}
+gg_miss_var(whales)
+```
+
+#use the 'skimr' packages to quickly glimpse the data:
+```{r glimpse-of-data-using-skimr}
+#gives a summary of the data
+skim(whales)
+```
+
