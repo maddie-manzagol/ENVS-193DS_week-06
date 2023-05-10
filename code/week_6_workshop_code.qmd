@@ -40,3 +40,59 @@ gg_miss_var(whales)
 skim(whales)
 ```
 
+# wrangling 
+```{r whales-wrangling}
+whales_clean <- whales %>% 
+  #create new column for year and month 
+  #extracting the year from the date column 
+  mutate(year_new = lubridate::year(date)) %>% 
+  #extracting the month from the date column 
+  mutate(month_new = lubridate::month(date)) %>% 
+  #unique(whales_clean$month_new) use this fucntion to view what months whale observations take place 
+  #create a new column for month names 
+  mutate(month_name = case_when( month_new == 2 ~ "February",
+                                month_new == 3 ~"March",
+                                month_new == 4 ~ "April",
+                                month_new == 5 ~ "May"),
+         month_name = forcats::as_factor (month_name),
+         #fct_relevel allows you to reorder your factor levels by hand 
+         month_name = forcats::fct_relevel(month_name, "February", "March", "April", "May")) %>% 
+  mutate(condition_new = case_when(
+    #str_detect allows you to detect the presence or absence of a match
+    stringr::str_detect(condition, "Excellent") ~ "excellent",
+    str_detect(condition, "Good") ~ "good",
+    str_detect(condition, "Fair") ~ "fair",
+    str_detect(condition, "Poor") ~ "poor"))
+
+```
+
+#create a plot and insert an image 
+
+```{r whales-2019}
+#create a new data frame to filter 2019 observations 
+
+whales_2019 <- whales_clean %>% 
+  filter(year_new == 2019)
+
+#read in the whale.png as a raster 
+whale_image <- magick::image_read(here("images", "noaa-gray-whale.png")) %>% 
+  as.raster()
+
+#make a box plot 
+
+whales_2019_boxplot <- ggplot(data= whales_2019, aes(x= month_name, y= total))+
+  geom_boxplot(aes(fill=month_name))+
+  #position_jitter locks the point in place 
+  geom_point(position = position_jitter(width = 0.3, height = 0, seed = 1))+
+  #manually adjust the colors
+  scale_fill_manual(values = natparks.pals("RockyMtn", 4))+
+  annotation_raster(whale_image, xmin = 2.5, xmax = 4.5, ymin = 30, ymax = 60)
+
+whales_2019_boxplot
+```
+
+```{r interactive-plot}
+library(png)
+ggplotly(whales_2019_boxplot)
+```
+
